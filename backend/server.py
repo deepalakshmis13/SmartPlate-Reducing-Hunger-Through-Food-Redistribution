@@ -236,6 +236,22 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     r = 6371  # Radius of earth in kilometers
     return c * r
 
+# ============ ROOT ENDPOINT ============
+
+@app.get("/")
+async def root():
+    """Root endpoint - API welcome message"""
+    return {
+        "message": "Welcome to SmartPlate API",
+        "version": "1.0.0",
+        "status": "running",
+        "endpoints": {
+            "api_base": "/api/",
+            "documentation": "/docs",
+            "health": "/api/analytics/public"
+        }
+    }
+
 # ============ AUTH ENDPOINTS ============
 
 class GoogleAuthRequest(BaseModel):
@@ -250,7 +266,7 @@ class RoleSelectRequest(BaseModel):
 
 @api_router.post("/auth/google")
 async def google_auth(request: GoogleAuthRequest):
-    """Authenticate with Google OAuth. REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH"""
+    """Authenticate with Google OAuth"""
     try:
         # Verify the Google token
         async with httpx.AsyncClient() as client_http:
