@@ -11,14 +11,13 @@ import {
   Camera, 
   MapPin, 
   Package,
-  Upload,
   Check,
   Truck,
   AlertTriangle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, userLocation }) => {
+const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, userLocation }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     quantity: request?.quantity - (request?.fulfilled_quantity || 0) || '',
@@ -40,19 +39,16 @@ export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, us
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Create preview
     const reader = new FileReader();
     reader.onload = (event) => {
       setPhotoPreview(event.target?.result);
     };
     reader.readAsDataURL(file);
 
-    // Upload file
     try {
       const response = await utilityApi.uploadFile(file);
       setFormData(prev => ({ ...prev, food_photo: response.data.file_id }));
       
-      // Get geotag if available
       if (userLocation) {
         setFormData(prev => ({ ...prev, geo_tag: userLocation }));
       }
@@ -111,7 +107,6 @@ export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, us
       toast.success('Thank you for your donation!');
       onSuccess();
       
-      // Reset form
       setFormData({
         quantity: '',
         food_condition: '',
@@ -145,7 +140,6 @@ export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, us
           </DialogDescription>
         </DialogHeader>
         
-        {/* Request Summary */}
         <div className="p-4 bg-secondary/50 rounded-xl space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">NGO</span>
@@ -243,7 +237,6 @@ export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, us
             </Select>
           </div>
           
-          {/* Photo Upload */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Camera className="h-4 w-4 text-primary" />
@@ -299,7 +292,6 @@ export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, us
             )}
           </div>
           
-          {/* Location */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-primary" />
@@ -349,5 +341,4 @@ export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, us
   );
 };
 
-
-
+export default FulfillRequestModal;
