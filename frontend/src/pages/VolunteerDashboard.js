@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { volunteerApi, analyticsApi, utilityApi } from '../services/api';
+import { volunteerApi, analyticsApi, utilityApi } from '@/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -420,3 +420,4 @@ export const VolunteerDashboard = () => {
     </DashboardLayout>
   );
 };
+
