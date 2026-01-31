@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, userLocation }) => {
+export const FullfillRequestModal = ({ request, open, onOpenChange, onSuccess, userLocation }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     quantity: request?.quantity - (request?.fulfilled_quantity || 0) || '',
@@ -348,4 +348,5 @@ export const FulfillRequestModal = ({ request, open, onOpenChange, onSuccess, us
     </Dialog>
   );
 };
+
 
