@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { GrainTexture } from '../components/GrainTexture';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
+import  jwtDecode  from 'jwt-decode';
 import { Shield, Heart, Users, Truck, CheckCircle } from 'lucide-react';
 
 const GOOGLE_CLIENT_ID = '258865302551-92d6t56v3als95fpmq81pn1ef82md6t5.apps.googleusercontent.com';
@@ -382,4 +382,5 @@ export const Auth = () => {
       <AuthContent />
     </GoogleOAuthProvider>
   );
+
 };
