@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -44,42 +44,47 @@ export const MapComponent = ({
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]);
 
+  // Memoize onClick to avoid triggering useEffect unnecessarily
+  const handleMapClick = useCallback(
+    (e) => {
+      if (onClick) {
+        onClick({ lat: e.latlng.lat, lng: e.latlng.lng });
+      }
+    },
+    [onClick]
+  );
+
+  // Initialize map only once
   useEffect(() => {
-    // Initialize map only once
     if (!mapInstanceRef.current && mapRef.current) {
       mapInstanceRef.current = L.map(mapRef.current).setView(
         [center.lat, center.lng],
         zoom
       );
 
-      // Add OpenStreetMap tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(mapInstanceRef.current);
 
-      // Add click handler if provided
       if (onClick) {
-        mapInstanceRef.current.on('click', (e) => {
-          onClick({ lat: e.latlng.lat, lng: e.latlng.lng });
-        });
+        mapInstanceRef.current.on('click', handleMapClick);
       }
     }
 
-    // Cleanup function
     return () => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
     };
-  }, []); // Empty dependency - only run once
+  }, [center.lat, center.lng, zoom, handleMapClick, onClick]); // include handleMapClick and onClick
 
-  // Update center when it changes
+  // Update map center when it changes
   useEffect(() => {
     if (mapInstanceRef.current && center) {
       mapInstanceRef.current.setView([center.lat, center.lng], zoom);
     }
-  }, [center, zoom]);
+  }, [center.lat, center.lng, zoom]);
 
   // Update markers
   useEffect(() => {
