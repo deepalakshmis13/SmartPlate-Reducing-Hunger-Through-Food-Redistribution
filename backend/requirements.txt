@@ -22,6 +22,7 @@ fastapi==0.110.1
 fastuuid==0.14.0
 filelock==3.20.3
 flake8==7.3.0
+flask-cors
 frozenlist==1.8.0
 fsspec==2026.1.0
 google-ai-generativelanguage==0.6.15
@@ -123,3 +124,4 @@ watchfiles==1.1.1
 websockets==15.0.1
 yarl==1.22.0
 zipp==3.23.0
+
