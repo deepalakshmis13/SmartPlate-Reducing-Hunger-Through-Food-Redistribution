@@ -1,37 +1,26 @@
-// craco.config.js
 const path = require("path");
 require("dotenv").config();
 
-// Check if we're in development/preview mode (not production build)
+// Environment flags
 const isDevServer = process.env.NODE_ENV !== "production";
+const enableHealthCheck = process.env.ENABLE_HEALTH_CHECK === "true";
+const enableVisualEdits = isDevServer;
 
-// Environment variable overrides
-const config = {
-  enableHealthCheck: process.env.ENABLE_HEALTH_CHECK === "true",
-  enableVisualEdits: isDevServer,
-};
-
-// Conditionally load visual edits modules only in dev mode
-let setupDevServer;
-let babelMetadataPlugin;
-
-if (config.enableVisualEdits) {
+// Conditional plugin loading
+let setupDevServer, babelMetadataPlugin;
+if (enableVisualEdits) {
   setupDevServer = require("./plugins/visual-edits/dev-server-setup");
   babelMetadataPlugin = require("./plugins/visual-edits/babel-metadata-plugin");
 }
 
-// Conditionally load health check modules only if enabled
-let WebpackHealthPlugin;
-let setupHealthEndpoints;
-let healthPluginInstance;
-
-if (config.enableHealthCheck) {
+let WebpackHealthPlugin, setupHealthEndpoints, healthPluginInstance;
+if (enableHealthCheck) {
   WebpackHealthPlugin = require("./plugins/health-check/webpack-health-plugin");
   setupHealthEndpoints = require("./plugins/health-check/health-endpoints");
   healthPluginInstance = new WebpackHealthPlugin();
 }
 
-const webpackConfig = {
+module.exports = {
   eslint: {
     configure: {
       extends: ["plugin:react-hooks/recommended"],
@@ -43,56 +32,33 @@ const webpackConfig = {
   },
   webpack: {
     alias: {
+      // Make sure '@' always points to src
       "@": path.resolve(__dirname, "src"),
     },
     configure: (webpackConfig) => {
       webpackConfig.watchOptions = {
         ...webpackConfig.watchOptions,
-        ignored: [
-          "**/node_modules/**",
-          "**/.git/**",
-          "**/build/**",
-          "**/dist/**",
-          "**/coverage/**",
-          "**/public/**",
-        ],
+        ignored: ["**/node_modules/**", "**/.git/**", "**/build/**", "**/dist/**", "**/coverage/**", "**/public/**"],
       };
 
-      if (config.enableHealthCheck && healthPluginInstance) {
+      if (enableHealthCheck && healthPluginInstance) {
         webpackConfig.plugins.push(healthPluginInstance);
       }
 
       return webpackConfig;
     },
   },
+  babel: enableVisualEdits && babelMetadataPlugin ? { plugins: [babelMetadataPlugin] } : undefined,
+  devServer: (devServerConfig) => {
+    if (enableVisualEdits && setupDevServer) devServerConfig = setupDevServer(devServerConfig);
+    if (enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
+      const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
+      devServerConfig.setupMiddlewares = (middlewares, devServer) => {
+        if (originalSetupMiddlewares) middlewares = originalSetupMiddlewares(middlewares, devServer);
+        setupHealthEndpoints(devServer, healthPluginInstance);
+        return middlewares;
+      };
+    }
+    return devServerConfig;
+  },
 };
-
-// Only add babel metadata plugin during dev server
-if (config.enableVisualEdits && babelMetadataPlugin) {
-  webpackConfig.babel = {
-    plugins: [babelMetadataPlugin],
-  };
-}
-
-webpackConfig.devServer = (devServerConfig) => {
-  if (config.enableVisualEdits && setupDevServer) {
-    devServerConfig = setupDevServer(devServerConfig);
-  }
-
-  if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
-    const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
-
-    devServerConfig.setupMiddlewares = (middlewares, devServer) => {
-      if (originalSetupMiddlewares) {
-        middlewares = originalSetupMiddlewares(middlewares, devServer);
-      }
-
-      setupHealthEndpoints(devServer, healthPluginInstance);
-      return middlewares;
-    };
-  }
-
-  return devServerConfig;
-};
-
-module.exports = webpackConfig;
