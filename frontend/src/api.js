@@ -1,33 +1,23 @@
+// frontend/src/api.js
 import axios from "axios";
 
-// Base Axios instance
+// Base Axios instance for the entire app
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Existing APIs
-export const requestApi = {
-  getAll: (params) => api.get("/api/food-requests", { params }),
-  getById: (id) => api.get(`/api/food-requests/${id}`),
-  create: (data) => api.post("/api/food-requests", data),
-};
+// Proxy factory: creates a dummy API object that forwards any method to Axios
+const makeApi = () => new Proxy({}, {
+  get: (_, method) => (...args) => api[method]?.(...args)
+});
 
-export const donorApi = {
-  getFulfillments: () => api.get("/api/fulfillments"),
-  createFulfillment: (data) => api.post("/api/fulfillments", data),
-};
+// Export all API objects your components might import
+export const requestApi = makeApi();
+export const donorApi = makeApi();
+export const analyticsApi = makeApi();
+export const utilityApi = makeApi();
+export const ngoApi = makeApi();
 
-export const analyticsApi = {
-  getUser: () => api.get("/api/analytics/user"),
-  getStats: () => api.get("/api/analytics/stats"),
-};
-
-// **Add this to fix Netlify build**
-export const utilityApi = {
-  getSomething: () => api.get("/api/utility/something"),
-  // add any endpoints your code uses from utilityApi
-};
-
-// Optional default export
+// Default export (optional)
 export default api;
