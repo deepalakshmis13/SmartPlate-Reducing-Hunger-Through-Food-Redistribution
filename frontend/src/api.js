@@ -1,13 +1,13 @@
 // frontend/src/api.js
 import axios from "axios";
 
-// Base Axios instance for the entire app
+// Base Axios instance for all APIs
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Helper function to create API objects dynamically
+// Helper: returns a Proxy object for any API
 const makeApi = () =>
   new Proxy(
     {},
@@ -16,13 +16,14 @@ const makeApi = () =>
     }
   );
 
-// Export **all API objects** your components might import
+// Export **all API objects your components might import**
 export const requestApi = makeApi();
 export const donorApi = makeApi();
 export const analyticsApi = makeApi();
 export const utilityApi = makeApi();
 export const ngoApi = makeApi();
 export const adminApi = makeApi();
+export const volunteerApi = makeApi(); // ✅ added
 
-// Optional: default export for general Axios use
+// Default export (optional)
 export default api;
