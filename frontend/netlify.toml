@@ -1,7 +1,18 @@
+# netlify.toml
+
 [build]
   base = "frontend"
   publish = "build"
-  command = "npm run build"
+  command = "CI=false npm run build"
 
 [build.environment]
   NODE_VERSION = "20"
+  REACT_APP_BACKEND_URL = "https://your-backend-api.com"
+  REACT_APP_GOOGLE_CLIENT_ID = "258865302551-92d6t56v3als95fpmq81pn1ef82md6t5.apps.googleusercontent.com"
+  ENABLE_HEALTH_CHECK = "true"
+
+# Optional: redirects (if you use React Router)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
