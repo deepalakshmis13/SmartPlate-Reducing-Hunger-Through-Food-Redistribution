@@ -7,17 +7,22 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Proxy factory: creates a dummy API object that forwards any method to Axios
-const makeApi = () => new Proxy({}, {
-  get: (_, method) => (...args) => api[method]?.(...args)
-});
+// Helper function to create API objects dynamically
+const makeApi = () =>
+  new Proxy(
+    {},
+    {
+      get: (_, method) => (...args) => api[method]?.(...args),
+    }
+  );
 
-// Export all API objects your components might import
+// Export **all API objects** your components might import
 export const requestApi = makeApi();
 export const donorApi = makeApi();
 export const analyticsApi = makeApi();
 export const utilityApi = makeApi();
 export const ngoApi = makeApi();
+export const adminApi = makeApi();
 
-// Default export (optional)
+// Optional: default export for general Axios use
 export default api;
