@@ -1,30 +1,27 @@
 import axios from "axios";
 
-// Set base URL globally
+// Base Axios instance for the entire app
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Wrap API calls in objects so old imports still work
-export const requestApi = {
-  getAll: (params) => api.get("/api/food-requests", { params }),
-  getById: (id) => api.get(`/api/food-requests/${id}`),
-  create: (data) => api.post("/api/food-requests", data),
-  // add other requestApi endpoints if needed
-};
+// Export dummy objects for all previous imports
+export const requestApi = new Proxy({}, {
+  get: (_, method) => (...args) => api[method]?.(...args)
+});
 
-export const donorApi = {
-  getFulfillments: () => api.get("/api/fulfillments"),
-  createFulfillment: (data) => api.post("/api/fulfillments", data),
-  // add other donorApi endpoints if needed
-};
+export const donorApi = new Proxy({}, {
+  get: (_, method) => (...args) => api[method]?.(...args)
+});
 
-export const analyticsApi = {
-  getUser: () => api.get("/api/analytics/user"),
-  getStats: () => api.get("/api/analytics/stats"),
-  // add other analyticsApi endpoints if needed
-};
+export const analyticsApi = new Proxy({}, {
+  get: (_, method) => (...args) => api[method]?.(...args)
+});
 
-// Default export for general use (optional)
+export const utilityApi = new Proxy({}, {
+  get: (_, method) => (...args) => api[method]?.(...args)
+});
+
+// Default export (optional)
 export default api;
