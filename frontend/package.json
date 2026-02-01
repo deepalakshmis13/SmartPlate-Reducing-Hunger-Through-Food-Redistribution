@@ -53,6 +53,7 @@
 
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "jwt-decode": "^3.1.2",
     "react-day-picker": "8.10.1",
     "react-hook-form": "^7.56.2",
     "react-leaflet": "^5.0.0",
@@ -109,6 +110,7 @@
 
   "packageManager": "yarn@1.22.22"
 }
+
 
 
 
