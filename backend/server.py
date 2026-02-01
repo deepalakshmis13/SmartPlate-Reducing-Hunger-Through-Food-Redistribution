@@ -36,6 +36,29 @@ GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 # Create the main app
 app = FastAPI(title="SmartPlate API", version="1.0.0")
+# ---------------- CORS CONFIG (FIXED) ----------------
+from fastapi.middleware.cors import CORSMiddleware
+import os
+
+origins_env = os.environ.get("CORS_ORIGINS")
+
+if origins_env:
+    allow_origins = origins_env.split(",")
+else:
+    allow_origins = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://697f36bbd1a3d0f10203adaa--smartplate-reducing-hunger.netlify.app"
+    ]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allow_origins,   # ❌ NOT "*"
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+# -----------------------------------------------------
 
 # Add session middleware for OAuth
 app.add_middleware(SessionMiddleware, secret_key=JWT_SECRET)
@@ -1298,14 +1321,8 @@ async def make_admin(email: str):
 # Include the router in the main app
 app.include_router(api_router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
