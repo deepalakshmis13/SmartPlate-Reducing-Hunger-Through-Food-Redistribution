@@ -1,17 +1,26 @@
-// frontend/src/api.js
-import axios from "axios";
+import axios from 'axios';
 
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
+// 1️⃣ Set your base URL for your backend API
+// Replace this with your actual backend URL
+const BASE_URL = 'https://smartplate-reducing-hunger-through-food-wqpn.onrender.com';
 
-export const adminApi = API;       // admin requests
-export const donorApi = API;       // donor requests
-export const volunteerApi = API;   // volunteer requests
-export const analyticsApi = API;   // analytics requests
-export const ngoApi = API;         // NGO requests
-
-export const requestApi = {
-  createRequest: (data) => API.post('/requests', data),
-  getAllRequests: () => API.get('/requests'),
+// 2️⃣ Create a reusable request function
+export const requestApi = async (endpoint, method = 'GET', data = null, headers = {}) => {
+  try {
+    const response = await axios({
+      url: `${BASE_URL}${endpoint}`,
+      method,
+      data,
+      headers,
+    });
+    return response.data; // returns the data directly
+  } catch (error) {
+    console.error('API request error:', error.response || error.message);
+    throw error;
+  }
 };
+
+// 3️⃣ Optional: You can create specific API functions for convenience
+export const registerUser = (userData) => requestApi('/auth/register', 'POST', userData);
+export const loginUser = (credentials) => requestApi('/auth/login', 'POST', credentials);
+export const getRequests = () => requestApi('/requests', 'GET');
