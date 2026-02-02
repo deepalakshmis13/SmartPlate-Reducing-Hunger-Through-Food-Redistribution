@@ -36,6 +36,9 @@ GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 # Create the main app
 app = FastAPI(title="SmartPlate API", version="1.0.0")
+from fastapi import APIRouter
+
+api_router = APIRouter(prefix="/api")
 # ---------------- CORS CONFIG (FIXED) ----------------
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -72,6 +75,7 @@ security = HTTPBearer()
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+app.include_router(api_router)
 
 # ============ PYDANTIC MODELS ============
 
@@ -1325,4 +1329,5 @@ app.include_router(api_router)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
 
